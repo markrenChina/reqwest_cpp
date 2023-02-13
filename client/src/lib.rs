@@ -25,12 +25,14 @@ pub extern "C" fn hello_world() {
 }
 
 //Send a 'Request'
-pub fn send_request(req: &Request) -> Result<Response> {
+pub fn send_request(req: &Request)
+//-> Result<Response> {
+{
     info!("Sending a GET request to {}", req.destination);
-    if log_enabled!(::log::LogLevel::Debug) {
+    if log_enabled!(::log::Level::Debug) {
         debug!("Sending {} Headers", req.headers.len());
         for header in req.headers.iter() {
-            debug!("\t{}: {}", header.name(),header.value_string());
+            //debug!("\t{}: {}",header.0.to_string(),header.1.as_str());
         }
         for cookie in req.cookies.iter() {
             debug!("\t{} = {}", cookie.name(), cookie.value());
@@ -41,10 +43,15 @@ pub fn send_request(req: &Request) -> Result<Response> {
 
     let client = Client::builder()
         .build()
-        .chain_err(|| "The native TLS backend couldn't be initialized")?;
+        .chain_err(|| "The native TLS backend couldn't be initialized");
 
-    client
-        .execute(req.to_reqwest())
-        .chain_err(|| "The request failed")
-        .and_then(|r| Response::from_reqwest(r))
+    //Ok(Response::from_reqwest(req.to_reqwest()))
+
+//    client
+//        .execute(req.to_reqwest())
+//    .
+//        .await
+//        .is_err_and(|| "The request failed")
+//        .then(|r| Response::from_reqwest(r))
+//        .chain_err(|| "The request failed")
 }

@@ -29,7 +29,7 @@ pub unsafe extern "C" fn request_create(url: *const c_char) -> *mut Request {
 
     let raw = CStr::from_ptr(url);
 
-    let url_as_str = match raw.to_str {
+    let url_as_str = match raw.to_str() {
         Ok(s) => s,
         Err(_) => return ptr::null_mut(),
     };
@@ -39,7 +39,7 @@ pub unsafe extern "C" fn request_create(url: *const c_char) -> *mut Request {
         Err(_) => return ptr::null_mut(),
     };
 
-    let req = Request::new(parsed_url, Method::Get);
+    let req = Request::new(parsed_url, Method::GET);
     println!("Request created in Rust: {}", url_as_str);
     Box::into_raw(Box::new(req))
 }
