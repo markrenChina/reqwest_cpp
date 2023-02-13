@@ -1,0 +1,21 @@
+[package]
+name = "client"
+version = "0.1.0"
+authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
+description = "The business logic for a REST client"
+repository = "https://github.com/Michael-F-Bryan/rust-ffi-guide"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.23"
+cookie = "0.17.0"
+error-chain = "0.12.4"
+fern = "0.6.1"
+libc = "0.2.139"
+log = "0.4.17"
+reqwest = "0.11.14"
+
+
+[lib]
+crate-type = ["cdylib"]
