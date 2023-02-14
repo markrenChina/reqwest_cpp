@@ -24,10 +24,16 @@ pub extern "C" fn hello_world() {
     println!("Hello World!");
 }
 
+static mut CLIENT : Option<Client> = None;
+
+
 //Send a 'Request'
 pub fn send_request(req: &Request)
 //-> Result<Response> {
 {
+    if &CLIENT == None {
+        &CLIENT = Some(Client::new());
+    }
     info!("Sending a GET request to {}", req.destination);
     if log_enabled!(::log::Level::Debug) {
         debug!("Sending {} Headers", req.headers.len());
@@ -41,9 +47,10 @@ pub fn send_request(req: &Request)
         trace!("{:#?}",req);
     }
 
-    let client = Client::builder()
-        .build()
-        .chain_err(|| "The native TLS backend couldn't be initialized");
+    &CLIENT
+    .Send(req)
+    .chain_err(|| "The native TLS backend couldn't be initialized")
+    ;
 
     //Ok(Response::from_reqwest(req.to_reqwest()))
 
