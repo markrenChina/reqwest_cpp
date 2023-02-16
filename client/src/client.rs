@@ -2,8 +2,6 @@ use reqwest::blocking::{Client, ClientBuilder, RequestBuilder};
 use libc::c_char;
 use std::{ptr, ffi::CStr};
 
-/// TODO 异常处理
-
 #[no_mangle]
 pub unsafe extern "C" fn newClientBuilder() -> *mut ClientBuilder{
     Box::into_raw(Box::new(ClientBuilder::new()))
@@ -15,7 +13,8 @@ pub unsafe extern "C" fn buildClient(client_builder: *mut ClientBuilder) ->*mut 
         return ptr::null_mut();
     }
     let r_client_builder = Box::from_raw(client_builder);
-    match (*r_client_builder).build() {
+    println!("client_builder = {:#?}", r_client_builder);
+    match r_client_builder.build() {
         Ok(c) => Box::into_raw(Box::new(c)),
         Err(_) => ptr::null_mut(),
     }
@@ -52,15 +51,23 @@ pub unsafe extern "C" fn get(client: *mut Client,url: *const c_char) -> *mut Req
     }
     let r_value = CStr::from_ptr(url).to_str().unwrap();
     let r_client : &Client = &*client;
-    Box::into_raw(Box::new(r_client.get(r_value)))
+    println!("client = {:#?}", r_client);
+    let rb : reqwest::blocking::RequestBuilder = r_client.get(r_value);
+    Box::into_raw(Box::new(rb))
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn get_test(client: *mut Client,url: *const c_char)-> *mut Response{
-    if client.is_null() || url.is_null(){
-        return ptr::null_mut();
-    }
-    let r_value = CStr::from_ptr(url).to_str().unwrap();
-    let r_client : &Client = &*client;
-    Box::into_raw(Box::new(r_client.get(r_value).send()))
-}
+// send直接用，测试过了
+//#[no_mangle]
+//pub unsafe extern "C" fn get_test(client: *mut Client,url: *const c_char) -> *mut Response{
+//    if client.is_null() || url.is_null(){
+//        return ptr::null_mut();
+//    }
+//    let r_value = CStr::from_ptr(url).to_str().unwrap();
+//    let r_client : &Client = &*client;
+//    let rep = r_client.get(r_value).send();
+//    match rep {
+//        Ok(r) => Box::into_raw(Box::new(r)),
+//        Err(_) => ptr::null_mut()
+//    }
+//}
+

@@ -1,10 +1,35 @@
 #include <string>
 #include <vector>
+#include <string>
+#include "client.hpp"
 
-struct Client;
-struct ClientBuilder;
-struct RequestBuilder;
-struct Response;
+namespace ffi{
+
+struct ClientBuilder {
+  ClientBuilder* user_agent(const std::string value);
+  Client* build();
+  ~ClientBuilder();
+};
+
+struct Client {
+  RequestBuilder* get(const std::string url);
+  ~Client();
+};
+
+struct RequestBuilder {
+  RequestBuilder* header(const std::string key, const std::string value);
+
+  Response* sendRequest();
+  ~RequestBuilder();
+};
+
+struct Response {
+  std::string text();
+  ~Response();
+};
+
+}
+
 
 //class Response {
 //public:
