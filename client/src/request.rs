@@ -1,43 +1,32 @@
 use cookie::CookieJar;
-use reqwest::{self, Method, Url};
-use reqwest::header:: HeaderMap;
+use reqwest::blocking::{RequestBuilder, Response};
+use libc::c_char;
+use std::{ptr, ffi::CStr};
 
-/// A HTTP request
-#[derive(Debug, Clone)]
-pub struct Request {
-    pub destination: Url,
-    pub method: Method,
-    pub headers: HeaderMap,
-    pub cookies: CookieJar,
-    pub body: Option<Vec<u8>>,
+#[no_mangle]
+pub unsafe extern "C" fn header(
+        requestBuilder : *mut RequestBuilder,
+        key: *const c_char,
+        value: *const c_char,
+)-> *mut RequestBuilder{
+    if requestBuilder.is_null() || key.is_null() || value.is_null() {
+        return ptr::null_mut();
+    }
+    let r_key = CStr::from_ptr(key).to_str().unwrap();
+    let r_value = CStr::from_ptr(value).to_str().unwrap();
+    Box::into_raw(Box::new(Box::from_raw(requestBuilder).header(r_key, r_value)))
 }
 
-impl Request{
-    pub fn new(destination: Url, method: Method) -> Request {
-        let headers = HeaderMap::default();
-        let cookies = CookieJar::default();
-        let body = None;
-
-        Request {
-            destination,
-            method,
-            headers,
-            cookies,
-            body,
-        }
+#[no_mangle]
+pub unsafe extern "C" fn send(
+        requestBuilder : *mut RequestBuilder,
+        )-> *mut Response{
+    if requestBuilder.is_null(){
+        return ptr::null_mut();
     }
-
-    pub(crate) fn to_reqwest(&self) -> reqwest::Request {
-        let mut r = reqwest::Request::new(self.method.clone(), self.destination.clone());
-        r.headers_mut().extend(self.headers.clone());
-
-//        let mut cookie_header = Cookie::new();
-//
-//        for cookie in self.cookies.iter() {
-//            cookie_header.set(cookie.name().to_owned(), cookie.value().to_owned());
-//        }
-//        r.headers_mut().set(cookie_header);
-
-        r
+    let result = Box::from_raw(requestBuilder).send();
+    match result {
+        Ok(rep) => Box::into_raw(Box::new(rep)),
+        Err(_) => ptr::null_mut()
     }
 }

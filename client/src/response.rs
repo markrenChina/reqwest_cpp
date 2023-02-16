@@ -1,28 +1,14 @@
-use std::io::Read;
-use reqwest::{ self, StatusCode };
-use reqwest::header::HeaderMap;
+use reqwest::blocking::Response;
+use libc::c_char;
+use std::ptr;
+use std::ffi::CString;
 
-use errors::*;
 
-#[derive(Debug, Clone)]
-pub struct Response {
-    pub headers: HeaderMap,
-    //pub body: Bytes,
-    pub status: StatusCode,
-}
-
-impl Response {
-
-//    #[tokio::main]
-    pub(crate) fn from_reqwest(original: reqwest::Response) -> Result<Response> {
-        let mut original = original.error_for_status()?;
-        let headers = original.headers().clone();
-        let status = original.status();
-        //let body = original.bytes().await;
-
-        Ok(Response {
-//            status,body,headers
-            status,headers
-        })
+#[no_mangle]
+pub unsafe extern "C" fn text(response: *mut Response) -> *mut c_char{
+    let result = Box::from_raw(response).text();
+    match result {
+        Ok(v) => CString::new(v).unwrap().into_raw(),
+        Err(_) => ptr::null_mut(),
     }
 }
