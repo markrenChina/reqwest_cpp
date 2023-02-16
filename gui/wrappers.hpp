@@ -1,6 +1,11 @@
 #include <string>
 #include <vector>
 
+struct Client;
+struct ClientBuilder;
+struct RequestBuilder;
+struct Response;
+
 //class Response {
 //public:
 //  Response(void* raw) : raw(raw) {}

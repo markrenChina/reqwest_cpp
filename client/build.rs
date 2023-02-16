@@ -3,6 +3,7 @@ extern crate cbindgen;
 use std::env;
 use std::path::PathBuf;
 use cbindgen::Config;
+use std::vec;
 
 fn main() {
     let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -15,6 +16,7 @@ fn main() {
 
     let config = Config {
         namespace: Some(String::from("ffi")),
+        includes: vec![String::from("wrappers.hpp")],
         ..Default::default()
     };
 

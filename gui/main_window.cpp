@@ -8,9 +8,9 @@ void MainWindow::onClick() {
   //std::cout << "Creating the request" << std::endl;
   ffi::hello_world();
   //ffi::ClientBuilder* c = ffi::newClientBuilder();
-//  char * body = text(send(get(buildClient(ffi::newClientBuilder()), "https://www.baidu.com/")));
-//  std::cout << body << std::endl;
-//  ffi::free_string(body);
+  char * body = ffi::text(ffi::send(ffi::get(ffi::buildClient(ffi::newClientBuilder()), "https://www.baidu.com/")));
+  std::cout << body << std::endl;
+  ffi::free_string(body);
 }
 
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent) {
