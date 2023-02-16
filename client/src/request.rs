@@ -24,7 +24,11 @@ pub unsafe extern "C" fn send(
     if requestBuilder.is_null(){
         return ptr::null_mut();
     }
-    let result = Box::from_raw(requestBuilder).send();
+
+    let rb : Box<RequestBuilder> = Box::from_raw(requestBuilder);
+    println!("befor send");
+    let result = (*rb).send();
+    println!("after send");
     match result {
         Ok(rep) => Box::into_raw(Box::new(rep)),
         Err(_) => ptr::null_mut()
