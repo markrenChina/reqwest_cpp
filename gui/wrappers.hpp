@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <string>
@@ -5,20 +7,41 @@
 
 namespace ffi{
 
+std::string last_error_message();
+
+class WrapperException: std::exception {
+public:
+  WrapperException(const std::string& msg) : msg(msg) {};
+  static WrapperException Last_error();
+
+  const char* what() const throw() {
+    return msg.c_str();
+  }
+private:
+  std::string msg;
+};
+
+
+
 struct ClientBuilder {
+
+  static ClientBuilder* New();
   ClientBuilder* user_agent(const std::string value);
+  ClientBuilder* default_headers(HeaderMap* headerMap);
+
   Client* build();
+  void destory(ClientBuilder* cb);
   ~ClientBuilder();
 };
 
 struct Client {
   RequestBuilder* get(const std::string url);
+  
   ~Client();
 };
 
 struct RequestBuilder {
   RequestBuilder* header(const std::string key, const std::string value);
-
   Response* sendRequest();
   ~RequestBuilder();
 };
@@ -28,26 +51,13 @@ struct Response {
   ~Response();
 };
 
+struct HeaderMap {
+  int32_t insert(const std::string key, const std::string value);
+  ~HeaderMap();
+};
+
 }
 
 
-//class Response {
-//public:
-//  Response(void* raw) : raw(raw) {}
-//  ~Response();
-//  std::vector<char> read_body();
-//private:
-//  void *raw;
-//};
-//
-//class Request {
-//public:
-//  Request(const std::string);
-//  ~Request();
-//  Response send();
-//
-//private:
-//  void* raw;
-//};
 
 

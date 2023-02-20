@@ -5,7 +5,7 @@ use std::ffi::CString;
 
 
 #[no_mangle]
-pub unsafe extern "C" fn text(response: *mut Response) -> *mut c_char{
+pub unsafe extern "C" fn response_text(response: *mut Response) -> *mut c_char{
     let result = Box::from_raw(response).text();
     match result {
         Ok(v) => CString::new(v).unwrap().into_raw(),

@@ -1,5 +1,4 @@
 extern crate chrono;
-extern crate cookie;
 #[macro_use]
 extern crate error_chain;
 extern crate fern;
@@ -13,8 +12,6 @@ mod errors;
 mod request;
 mod response;
 mod client;
+mod headermap;
+mod utils;
 
-#[no_mangle]
-pub extern "C" fn hello_world() {
-    println!("Hello World!");
-}

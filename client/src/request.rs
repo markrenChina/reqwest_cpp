@@ -5,7 +5,7 @@ use std::{ptr, ffi::CStr};
 
 
 #[no_mangle]
-pub unsafe extern "C" fn header(
+pub unsafe extern "C" fn request_builder_header(
         request_builder : *mut RequestBuilder,
         key: *const c_char,
         value: *const c_char,
@@ -21,7 +21,7 @@ pub unsafe extern "C" fn header(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn send_request(
+pub unsafe extern "C" fn request_builder_send(
         request_builder : *mut RequestBuilder,
         )-> *mut Response{
     if request_builder.is_null(){

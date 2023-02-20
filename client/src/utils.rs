@@ -1,9 +1,9 @@
-use std::sync::{Once, ONCE_INIT};
+use std::sync::Once;
 use fern;
-use log::LogLevelFilter;
+use log::LevelFilter;
 use chrono::Local;
 
-use errors::*;
+use crate::errors::*;
 
 /// Initialize the global logger and log to `rest_client.log`.
 ///
@@ -11,26 +11,25 @@ use errors::*;
 /// times as you want and logging will only be initialized the first time.
 #[no_mangle]
 pub extern "C" fn initialize_logging() {
-    static INITIALIZE : Once = ONCE_INIT;
+    static INITIALIZE : Once = Once::new();
     INITIALIZE.call_once ( || {
         fern::Dispatch::new()
             .format(|out, message, record| {
-                let loc = record.location();
 
                 out.finish(format_args!(
-                    "{} {:7} ({}#{}): {}{}",
+                    "{} {:7} ({:?}#{:?}): {}{}",
                     Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
                     record.level(),
-                    loc.module_path(),
-                    loc.line(),
+                    record.module_path(),
+                    record.line(),
                     message,
                     if cfg!(windows) { "\r" } else { "" }
                     ))
             })
-            .level(LogLevelFilter::Debug)
-            .chain(fern::log_file("rest_client.log").unwarp())
+            .level(LevelFilter::Debug)
+            .chain(fern::log_file("rest_client.log").unwrap())
             .apply()
-            .unwarp();
+            .unwrap();
     });
 }
 
@@ -38,7 +37,7 @@ pub extern "C" fn initialize_logging() {
 pub fn backtrace(e : &Error) {
     error!("Error: {}", e);
 
-    for caused in e.iter().skip(1) {
+    for cause in e.iter().skip(1) {
         warn!("\tCaused By: {}",cause );
     }
 }
