@@ -1,29 +1,27 @@
 //! The foreign function interface which exposes this library to non-Rust
 //! languages.
 
-use std::ffi::CString;
-use std::{ptr, slice, usize};
-use std::error::Error as StdError;
+use std::ffi::{CString, CStr};
+use std::{ptr, slice, usize, time::Duration};
+use anyhow::Error;
 use libc::{c_char, c_int };
 use std::cell::RefCell;
 
-use crate::errors::*;
-
 thread_local! {
-    static LAST_ERROR : RefCell<Option<Box<StdError>>> = RefCell::new(None);
+    static LAST_ERROR : RefCell<Option<Box<Error>>> = RefCell::new(None);
 }
 
 /// Update the most recent error, clearing whatever may have been there before.
-pub fn update_last_error<E: StdError + 'static>(err: E) {
+pub fn update_last_error(err: Error) {
     error!("Setting LAST_ERROR: {}",err);
     println!("update_last_error");
      {
          // Print a pseudo-backtrace for this error, following back each error's
          // cause until we reach the root error.
-         let mut cause = err.cause();
+         let mut cause = err.source();
          while let Some(parent_err) = cause {
              warn!("Caused by: {}", parent_err);
-             cause = parent_err.cause();
+             cause = parent_err.source();
          }
      }
 
@@ -33,7 +31,7 @@ pub fn update_last_error<E: StdError + 'static>(err: E) {
 }
 
 /// Retrieve the most recent error, clearing it in the process.
-pub fn take_last_error() -> Option<Box<StdError>> {
+pub fn take_last_error() -> Option<Box<Error>> {
     LAST_ERROR.with(|prev| prev.borrow_mut().take())
 }
 
@@ -93,11 +91,35 @@ pub unsafe extern "C" fn last_error_message(buffer: *mut c_char, length: c_int) 
     error_message.len() as c_int
 }
 
-
 #[no_mangle]
 pub unsafe extern "C" fn free_string(s: *mut c_char){
     if s.is_null() {
         return;
     }
     drop(CString::from_raw(s));
+}
+
+
+pub fn to_rust_str<'a>(ptr: *const c_char,err_tip :&'static str) -> Option<&'a str>{
+    if ptr.is_null() {
+        return None;
+    }
+    unsafe {
+        match CStr::from_ptr(ptr).to_str() {
+            Ok(v) => Some(v),
+            Err(e) => {
+                update_last_error(Error::new(e).context(err_tip));
+                None
+            }
+        }
+    }
+}
+
+pub fn u64_to_millos_duration(millisecond :*const u64) -> Option<Duration> {
+    if millisecond.is_null() {
+        return None;
+    }
+    unsafe{
+        Some(Duration::from_millis(*millisecond))
+    }
 }

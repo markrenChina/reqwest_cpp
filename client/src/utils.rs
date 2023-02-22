@@ -3,8 +3,6 @@ use fern;
 use log::LevelFilter;
 use chrono::Local;
 
-use crate::errors::*;
-
 /// Initialize the global logger and log to `rest_client.log`.
 ///
 /// Note that this is an idempotent function, so you can call it as many
@@ -33,11 +31,11 @@ pub extern "C" fn initialize_logging() {
     });
 }
 
-/// Log an error and each successive thing which caused it.
-pub fn backtrace(e : &Error) {
-    error!("Error: {}", e);
-
-    for cause in e.iter().skip(1) {
-        warn!("\tCaused By: {}",cause );
-    }
-}
+// Log an error and each successive thing which caused it.
+//pub fn backtrace(e : &Error) {
+//    error!("Error: {}", e);
+//
+//    for cause in e.iter().skip(1) {
+//        warn!("\tCaused By: {}",cause );
+//    }
+//}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <string>
@@ -28,6 +29,13 @@ struct ClientBuilder {
   static ClientBuilder* New();
   ClientBuilder* user_agent(const std::string value);
   ClientBuilder* default_headers(HeaderMap* headerMap);
+  ClientBuilder* redirect(size_t max);
+  ClientBuilder* referer(bool enable);
+  ClientBuilder* proxy(Proxy* proxy);
+  ClientBuilder* timeout(uint64_t* millisecond);
+  ClientBuilder* timeout(uint64_t millisecond);
+  ClientBuilder* pool_idle_timeout(uint64_t* millisecond);
+  ClientBuilder* pool_idle_timeout(uint64_t millisecond);
 
   Client* build();
   void destory(ClientBuilder* cb);
@@ -35,13 +43,13 @@ struct ClientBuilder {
 };
 
 struct Client {
-  RequestBuilder* get(const std::string url);
+  RequestBuilder* get(const std::string& url);
   
   ~Client();
 };
 
 struct RequestBuilder {
-  RequestBuilder* header(const std::string key, const std::string value);
+  RequestBuilder* header(const std::string& key, const std::string& value);
   Response* sendRequest();
   ~RequestBuilder();
 };
@@ -52,8 +60,14 @@ struct Response {
 };
 
 struct HeaderMap {
-  int32_t insert(const std::string key, const std::string value);
+  int32_t insert(const std::string& key, const std::string& value);
   ~HeaderMap();
+};
+
+namespace  proxy {
+  Proxy* http(const std::string& proxy_scheme);
+  Proxy* https(const std::string& proxy_scheme);
+  Proxy* all(const std::string& proxy_scheme);
 };
 
 }

@@ -1,4 +1,5 @@
 #include "wrappers.hpp"
+#include "client.hpp"
 #include <cassert>
 #include <iostream>
 
@@ -47,26 +48,55 @@ ClientBuilder* ClientBuilder::user_agent(const std::string value){
 ClientBuilder* ClientBuilder::default_headers(HeaderMap* headerMap){
   RETURN_SELF_NULL_THROW(ffi::client_builder_default_headers(this,headerMap))
 }
-RequestBuilder* RequestBuilder::header(
-    const std::string key, const std::string value){
 
-  RETURN_SELF_NULL_THROW(ffi::request_builder_header(this,key.c_str(),value.c_str()))
+ClientBuilder* ClientBuilder::redirect(size_t max){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_redirect(this,max))
+}
+
+ClientBuilder* ClientBuilder::referer(bool enable){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_referer(this,enable))
+}
+
+ClientBuilder* ClientBuilder::proxy(Proxy *proxy){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_proxy(this,proxy))
+}
+
+ClientBuilder* ClientBuilder::timeout(uint64_t* millisecond){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_timeout(this,millisecond))
+}
+
+ClientBuilder* ClientBuilder::timeout(uint64_t millisecond){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_timeout(this,&millisecond))
+}
+
+ClientBuilder* ClientBuilder::pool_idle_timeout(uint64_t* millisecond){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_timeout(this,millisecond))
+}
+
+ClientBuilder* ClientBuilder::pool_idle_timeout(uint64_t millisecond){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_timeout(this,&millisecond))
+}
+
+RequestBuilder* RequestBuilder::header(
+    const std::string& key, const std::string& value){
+
+  RETURN_SELF_NULL_THROW(request_builder_header(this,key.c_str(),value.c_str()))
 }
 
 Client* ClientBuilder::build() {
-  RETURN_SELF_NULL_THROW(ffi::client_builder_build_client(this))
+  RETURN_SELF_NULL_THROW(client_builder_build_client(this))
 }
 
 void ClientBuilder::destory(ClientBuilder *cb) {
-  ffi::client_builder_destory(cb);
+  client_builder_destory(cb);
 }
 
-RequestBuilder* Client::get(const std::string url){
-  RETURN_SELF_NULL_THROW(ffi::client_get(this,url.c_str()))
+RequestBuilder* Client::get(const std::string& url){
+  RETURN_SELF_NULL_THROW(client_get(this,url.c_str()))
 }
 
 Response* RequestBuilder::sendRequest(){
-  RETURN_SELF_NULL_THROW(ffi::request_builder_send(this))
+  RETURN_SELF_NULL_THROW(request_builder_send(this))
 }
 
 std::string Response::text(){
@@ -76,8 +106,18 @@ std::string Response::text(){
   return res;
 }
 
-int32_t HeaderMap::insert(const std::string key, const std::string value){
+int32_t HeaderMap::insert(const std::string& key, const std::string& value){
   return ffi::header_map_insert(this,key.c_str(),value.c_str());
+}
+
+Proxy* proxy::http(const std::string& proxy_scheme){
+  RETURN_SELF_NULL_THROW(proxy_reqwest_http(proxy_scheme.c_str()));
+}
+Proxy* proxy::https(const std::string& proxy_scheme){
+  RETURN_SELF_NULL_THROW(proxy_reqwest_https(proxy_scheme.c_str()));
+}
+Proxy* proxy::all(const std::string& proxy_scheme){
+  RETURN_SELF_NULL_THROW(proxy_reqwest_all(proxy_scheme.c_str()));
 }
 
 }

@@ -8,7 +8,6 @@ ffi::Client* clinet = nullptr;
 
 void MainWindow::onClick() {
   //std::cout << "Creating the request" << std::endl;
-  {
     try{
       ffi::HeaderMap* headerMap = ffi::new_header_map();
       headerMap->insert("default","value");
@@ -16,10 +15,13 @@ void MainWindow::onClick() {
         clinet = ffi::ClientBuilder::New()
                      ->user_agent("Rust/1.0.0")
                      ->default_headers(headerMap)
+                     ->redirect(10)
+                     ->proxy(ffi::proxy::http("http://192.168.1.37:8888"))
+                     ->timeout(nullptr)
                      ->build();
       }
       std::string body = clinet
-                             ->get("http://192.168.1.29:8023/")
+                             ->get("http://192.168.1.29:8023/c9/test/redirect")
                              ->header("Test1","abv")
                              ->header("Test2","abv")
                              ->sendRequest()
@@ -28,7 +30,6 @@ void MainWindow::onClick() {
     }catch (const ffi::WrapperException& e){
       std::cout <<  e.what() << std::endl;
     }
-  }
 }
 
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent) {

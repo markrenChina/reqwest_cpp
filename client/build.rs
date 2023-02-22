@@ -39,9 +39,10 @@ fn main() {
         ..Default::default()
     };
 
-    cbindgen::generate_with_config(&crate_dir, config)
-        .unwrap()
-        .write_to_file(&output_file);
+    let _ = match cbindgen::generate_with_config(&crate_dir, config) {
+        Ok(x) => x.write_to_file(&output_file),
+        Err(e) => {println!("{:#?}", e); false}
+    };
 }
 
 /// Find the location of the `target/` directory. Note that this may be

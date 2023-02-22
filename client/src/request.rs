@@ -1,8 +1,10 @@
 //use cookie::CookieJar;
 use reqwest::blocking::{Response, RequestBuilder};
 use libc::c_char;
+use anyhow::Error;
 use std::{ptr, ffi::CStr};
 
+use crate::ffi::update_last_error;
 
 #[no_mangle]
 pub unsafe extern "C" fn request_builder_header(
@@ -30,9 +32,12 @@ pub unsafe extern "C" fn request_builder_send(
 
     let r_request_builder = Box::from_raw(request_builder);
     let result = r_request_builder.send();
-    println!("after send");
     match result {
         Ok(r) => Box::into_raw(Box::new(r)),
-        Err(_) => ptr::null_mut()
+        Err(e) => {
+            let err = Error::new(e).context("send request error");
+            update_last_error(err);
+            ptr::null_mut()
+        }
     }
 }

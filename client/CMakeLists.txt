@@ -7,6 +7,7 @@ else ()
     set(TARGET_DIR "release")
 endif ()
 
+
 set(CLIENT_SO "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_DIR}/libclient.so")
 
 add_custom_target(client ALL

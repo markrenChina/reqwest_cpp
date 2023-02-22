@@ -18,6 +18,6 @@ pub unsafe extern "C" fn header_map_insert(
     }
     let r_key = CStr::from_ptr(key).to_str().unwrap();
     let r_value = CStr::from_ptr(value).to_str().unwrap();
-    let bk = (&mut *header_map).insert(r_key, r_value.parse().unwrap());
+    (&mut *header_map).insert(r_key, r_value.parse().unwrap());
     0
 }
