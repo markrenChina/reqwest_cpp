@@ -6,7 +6,8 @@ class MainWindow : public QMainWindow {
 public:
   MainWindow(QWidget* parent = nullptr);
 private slots:
-  void onClick();
+  void test_full();
+  void test_destructor();
 private:
-  QPushButton *button;
+  QPushButton* button;
 };

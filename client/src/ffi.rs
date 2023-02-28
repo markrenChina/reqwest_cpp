@@ -3,18 +3,56 @@
 
 use std::ffi::{CString, CStr};
 use std::{ptr, slice, usize, time::Duration};
-use anyhow::Error;
+use anyhow::{Error, anyhow};
 use libc::{c_char, c_int };
 use std::cell::RefCell;
+use std::convert::From;
 
 thread_local! {
     static LAST_ERROR : RefCell<Option<Box<Error>>> = RefCell::new(None);
 }
 
+
+#[repr(C)]
+//#[derive(Clone)]
+pub struct Pair{
+    key: *const c_char,
+    value: *const c_char,
+}
+
+impl From<(String, String)> for Pair{
+    fn from(tup: (String, String)) -> Self {
+        Pair {
+            key: match CString::new(tup.0) {
+                Ok(v) => v.into_raw(),
+                Err(_) => ptr::null(),
+            },
+            value: match CString::new(tup.1){
+                Ok(v) => v.into_raw(),
+                Err(_) => ptr::null_mut(),
+            }
+        }
+    }
+}
+
+impl From<&Pair> for (String,String) {
+    fn from(tup: &Pair) -> (String,String) {
+        let key = match to_rust_str(tup.key, "key pasre error") {
+            Some(v) => v.to_string(),
+            None => String::from(""),
+        };
+        let value = match to_rust_str(tup.value, "value pasre error") {
+            Some(v) => v.to_string(),
+            None => String::from(""),
+        };
+        (key, value)
+    }
+}
+
 /// Update the most recent error, clearing whatever may have been there before.
 pub fn update_last_error(err: Error) {
     error!("Setting LAST_ERROR: {}",err);
-    println!("update_last_error");
+    println!("update_last_error : {}", err);
      {
          // Print a pseudo-backtrace for this error, following back each error's
          // cause until we reach the root error.
@@ -92,13 +130,22 @@ pub unsafe extern "C" fn last_error_message(buffer: *mut c_char, length: c_int) 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn free_string(s: *mut c_char){
+pub unsafe extern "C" fn free_string(s: *const c_char){
     if s.is_null() {
+        update_last_error(anyhow!("string is null"));
         return;
     }
-    drop(CString::from_raw(s));
+    drop(CString::from_raw(s as *mut _));
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn free_vec_u8(s: *const u8, len: usize){
+    if s.is_null() {
+        update_last_error(anyhow!("u8 ptr is null"));
+        return;
+    }
+    drop(Vec::from_raw_parts(s as *mut u8,len,len));
+}
 
 pub fn to_rust_str<'a>(ptr: *const c_char,err_tip :&'static str) -> Option<&'a str>{
     if ptr.is_null() {
@@ -114,6 +161,7 @@ pub fn to_rust_str<'a>(ptr: *const c_char,err_tip :&'static str) -> Option<&'a s
         }
     }
 }
+
 
 pub fn u64_to_millos_duration(millisecond :*const u64) -> Option<Duration> {
     if millisecond.is_null() {

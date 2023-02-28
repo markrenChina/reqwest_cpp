@@ -13,5 +13,5 @@ int main(int argc,char **argv) {
   mainWindow.show();
 
   app.exec();
-  std::cout << "===============2===========" << std::endl;
+  std::cout << "===============app exit===========" << std::endl;
 }

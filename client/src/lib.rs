@@ -3,7 +3,7 @@ extern crate fern;
 extern crate libc;
 #[macro_use]
 extern crate log;
-extern crate reqwest;
+pub extern crate reqwest;
 extern crate anyhow;
 
 pub mod ffi;
