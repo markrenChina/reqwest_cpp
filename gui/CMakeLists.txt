@@ -26,10 +26,10 @@ target_link_libraries(gui Qt5::Widgets)
 target_link_libraries(gui ${CLIENT_DIR}/libclient.so)
 add_dependencies(gui client)
 
-# 链接静态生成so库
-#set(SRC wrappers.cpp wrappers.hpp ffi.hpp)
-#add_library(reqwest_cpp SHARED ${SRC})
-#target_link_libraries(reqwest_cpp ${CLIENT_DIR}/libclient.a)
+# 生成so库
+set(SRC wrappers.cpp wrappers.hpp ffi.hpp)
+add_library(reqwest_cpp SHARED ${SRC})
+target_link_libraries(reqwest_cpp ${CLIENT_DIR}/libclient.so)
 #add_dependencies(reqwest_cpp client)
 
 # 测试静态链接生成的so库

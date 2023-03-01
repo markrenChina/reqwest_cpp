@@ -339,7 +339,7 @@ struct ClientBuilder {
   /// This method fails if TLS backend cannot be initialized, or the resolver
   /// cannot load the system configuration.
   Client* build();
-  void destory(ClientBuilder* cb);
+  void destory();
 private:
   ClientBuilder() = delete;
   ~ClientBuilder() = delete;
@@ -412,8 +412,8 @@ struct Client {
   ///
   /// This method fails if there was an error while sending request,
   /// or redirect limit was exhausted.
-  Response* client_execute(Request *request);
-  void client_destory(Client *client);
+  Response* execute(Request *request);
+  void destory();
 private:
   Client() = delete;
   ~Client() = delete;
@@ -496,7 +496,7 @@ struct RequestBuilder {
   /// `Client::execute()`.
   Request* build();
 
-
+  void destory();
 private:
   RequestBuilder() = delete;
   ~RequestBuilder() = delete;
@@ -566,6 +566,7 @@ struct Response {
   ///_ => "unreachable"
   std::string version();
 
+  void destory();
 private:
   Response() = delete;
   ~Response() = delete;
@@ -576,6 +577,7 @@ namespace  proxy {
   Proxy* http(const std::string& proxy_scheme);
   Proxy* https(const std::string& proxy_scheme);
   Proxy* all(const std::string& proxy_scheme);
+  void destory(Proxy* p);
 };
 
 }

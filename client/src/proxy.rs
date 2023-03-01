@@ -64,3 +64,11 @@ pub unsafe extern "C" fn proxy_reqwest_all(proxy_scheme: *const c_char) -> *mut 
 }
 
 //TODO custom
+
+#[no_mangle]
+pub unsafe extern "C" fn proxy_reqwest_destory(p :*mut Proxy){
+    if p.is_null() {
+        return ;
+    }
+    drop(Box::from_raw(p))
+}

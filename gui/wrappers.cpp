@@ -223,8 +223,8 @@ Client* ClientBuilder::build() {
   RETURN_SELF_NULL_THROW(client_builder_build_client(this))
 }
 
-void ClientBuilder::destory(ClientBuilder *cb) {
-  client_builder_destory(cb);
+void ClientBuilder::destory() {
+  client_builder_destory(this);
 }
 
 RequestBuilder* Client::get(const std::string& url){
@@ -251,8 +251,12 @@ RequestBuilder* Client::request(const std::string& method,const std::string &url
   RETURN_SELF_NULL_THROW(ffi::client_request(this,method.c_str(),url.c_str()))
 }
 
-Response* Client::client_execute(Request *request){
+Response* Client::execute(Request *request){
   RETURN_SELF_NULL_THROW(ffi::client_execute(this,request))
+}
+
+void Client::destory(){
+  ffi::client_destory(this);
 }
 
 RequestBuilder* RequestBuilder::basic_auth(
@@ -323,6 +327,14 @@ RequestBuilder* RequestBuilder::try_clone(){
 
 RequestBuilder* RequestBuilder::version(const std::string& version){
   RETURN_SELF_NULL_THROW(ffi::request_builder_version(this,version.c_str()))
+}
+
+void RequestBuilder::destory() {
+  ffi::request_builder_destory(this);
+}
+
+void Response::destory() {
+  ffi::response_destory(this);
 }
 
 std::string Response::text_and_destory(){
@@ -456,6 +468,10 @@ Proxy* proxy::https(const std::string& proxy_scheme){
 }
 Proxy* proxy::all(const std::string& proxy_scheme){
   RETURN_SELF_NULL_THROW(proxy_reqwest_all(proxy_scheme.c_str()));
+}
+
+void proxy::destory(Proxy *p) {
+  proxy_reqwest_destory(p);
 }
 
 }

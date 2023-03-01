@@ -212,3 +212,10 @@ pub unsafe extern "C" fn response_copy_to(response: *mut Response)
 //TODO body mut api
 
 
+#[no_mangle]
+pub unsafe extern "C" fn response_destory(response: *mut Response){
+    if response.is_null() {
+        return;
+    }
+    drop(Box::from_raw(response))
+}

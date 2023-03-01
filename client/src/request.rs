@@ -329,3 +329,11 @@ pub unsafe extern "C" fn request_builder_try_clone(request_builder : *mut Reques
         None => ptr::null_mut()
     }
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn request_builder_destory(request_builder : *mut RequestBuilder){
+    if request_builder.is_null(){
+        return;
+    }
+    drop(Box::from_raw(request_builder))
+}
