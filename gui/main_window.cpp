@@ -19,6 +19,7 @@ void MainWindow::test_full() {
         clinet = ffi::ClientBuilder::New()
                      ->user_agent("Rust/1.0.0")
                      ->default_headers(headerMap)
+                     ->default_headers({{"de","he"}})
                      ->redirect(10)
                      //->proxy(ffi::proxy::http("http://192.168.1.37:8888"))
                      ->timeout(nullptr)
@@ -36,15 +37,15 @@ void MainWindow::test_full() {
                              //->file_body("rest_client.log")
                              ->timeout(1000)
                              ->send();
-      auto headmap2 = resp->headers();
+      auto headermap2 = resp->headers();
       //headmap2->get("content-type");
-      std::cout << headmap2->get("content-type") << std::endl;
-      std::cout << headmap2->keys() << std::endl;
-      std::cout << headmap2->values() << std::endl;
+      std::cout << headermap2->get("content-type") << std::endl;
+      std::cout << headermap2->keys() << std::endl;
+      std::cout << headermap2->values() << std::endl;
 //      std::string body = resp->text_and_destory();
 //      std::cout << body << std::endl;
+      headermap2->destory();
       ffi::Bytes::ptr b = resp->bytes_and_destory();
-      ffi::header_map_destory(headmap2);
     }catch (const ffi::WrapperException& e){
       std::cout << e.what() << std::endl;
     }

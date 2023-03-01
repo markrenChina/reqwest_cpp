@@ -1,9 +1,9 @@
 [package]
 name = "client"
-version = "0.1.0"
-authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
-description = "The business logic for a REST client"
-repository = "https://github.com/Michael-F-Bryan/rust-ffi-guide"
+version = "1.0.0"
+authors = ["markrenChina <390835144@qq.com>"]
+description = "T"
+repository = ""
 build="build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -18,7 +18,7 @@ reqwest = { version = "0.11", features = ["blocking", "json","__tls"] }
 
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib","staticlib"]
 
 [build-dependencies]
 cbindgen = "0.24.3"

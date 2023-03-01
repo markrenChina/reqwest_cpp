@@ -8,9 +8,6 @@ use std::net::{IpAddr, SocketAddr};
 
 use crate::ffi::*;
 
-//TODO 测试传入的client builder 内存地址和 box form raw 之后，和执行之后，和返回之后 有没有变化
-//TODO 取消headmap的暴露，改为传递 Pair 数组
-
 /// Constructs a new `ClientBuilder`.
 #[no_mangle]
 pub unsafe extern "C" fn new_client_builder() -> *mut ClientBuilder{
@@ -38,13 +35,20 @@ pub unsafe extern "C" fn client_builder_user_agent(
         client_builder: *mut ClientBuilder,
         value: *const c_char
 )->*mut ClientBuilder{
+    //println!("addr of client_builder={:p}", client_builder);
     if client_builder.is_null(){
         update_last_error(anyhow!("user agent is null when use user_agent"));
         return ptr::null_mut();
     }
     let r_value = to_rust_str(value, "").unwrap();
-    let result: ClientBuilder = Box::from_raw(client_builder).user_agent(r_value);
-    Box::into_raw(Box::new(result))
+    let r_client_builder: Box<ClientBuilder> = Box::from_raw(client_builder);
+    //println!("addr of r_client_builder={:p}", r_client_builder);  //r_client_builder also point
+
+    let result: ClientBuilder = r_client_builder.user_agent(r_value);
+    //println!("addr of r_client_builder after use user_agent={:p}", &result);
+    let res = Box::into_raw(Box::new(result));
+    //println!("addr of client_builder into raw={:p}", res);
+    res
 }
 
 /// Set a `redirect::Policy` for this client.
@@ -931,5 +935,13 @@ mod tests {
                 print!("{:#?}",e)
             }
         };
+    }
+
+    #[test]
+    fn test_addr(){
+        let cb = reqwest::blocking::ClientBuilder::new();
+        println!("addr of client_builder new={:p}", &cb);
+        let cb2 = cb.user_agent("AB");
+        println!("addr of client_builder user_agent={:p}", &cb2);
     }
 }

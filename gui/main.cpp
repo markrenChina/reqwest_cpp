@@ -5,7 +5,7 @@
 
 
 int main(int argc,char **argv) {
-  ffi::initialize_logging();
+//  ffi::initialize_logging();
 
   QApplication app(argc, argv);
 

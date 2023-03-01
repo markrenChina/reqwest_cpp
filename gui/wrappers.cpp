@@ -8,6 +8,7 @@
 #include <string>
 #include <sys/types.h>
 #include <vector>
+#include "client.hpp"
 
 namespace ffi {
 
@@ -22,6 +23,7 @@ const char * _v = fun;  \
 if(_v) {std::string _res(_v);  \
 ffi::free_string(_v); \
 return _res;} else return "";
+
 
 
 std::string last_error_message() {
@@ -49,6 +51,10 @@ WrapperException WrapperException::Last_error() {
   }
 }
 
+Bytes::~Bytes() {
+  ffi::free_vec_u8(m_data,m_len);
+}
+
 ClientBuilder* ClientBuilder::New() {
   RETURN_SELF_NULL_THROW(ffi::new_client_builder())
 }
@@ -62,6 +68,14 @@ ClientBuilder* ClientBuilder::danger_accept_invalid_certs(bool accept_invalid_ce
 }
 
 ClientBuilder* ClientBuilder::default_headers(HeaderMap* headerMap){
+  RETURN_SELF_NULL_THROW(ffi::client_builder_default_headers(this,headerMap))
+}
+
+ClientBuilder* ClientBuilder::default_headers(std::initializer_list<Pair> headers){
+  HeaderMap* headerMap = HeaderMap::New();
+  for (auto &item : headers){
+    headerMap->insert(item.key,item.value);
+  }
   RETURN_SELF_NULL_THROW(ffi::client_builder_default_headers(this,headerMap))
 }
 
@@ -198,7 +212,11 @@ ClientBuilder* ClientBuilder::tls_sni(bool tls_sni){
 }
 
 ClientBuilder* ClientBuilder::user_agent(const std::string& value){
+//  std::cout << "addr in cpp to rust:" << std::hex << (void *)this << std::endl;
   RETURN_SELF_NULL_THROW(ffi::client_builder_user_agent(this,value.c_str()))
+//  auto _res = ffi::client_builder_user_agent(this,value.c_str());
+//  std::cout << "addr in cpp out rust:" << std::hex << (void *)_res << std::endl;
+//  return IF_NULL_THROW(_res);
 }
 
 Client* ClientBuilder::build() {
@@ -424,6 +442,10 @@ bool HeaderMap::remove(std::string& key){
 
 void HeaderMap::reserve(uintptr_t additional){
   return ffi::header_map_reserve(this, additional);
+}
+
+void HeaderMap::destory() const{
+  ffi::header_map_destory(this);
 }
 
 Proxy* proxy::http(const std::string& proxy_scheme){

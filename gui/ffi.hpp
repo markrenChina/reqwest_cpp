@@ -9,4 +9,5 @@ struct Request;
 struct Response;
 struct HeaderMap;
 struct Proxy;
+struct Pair;
 }

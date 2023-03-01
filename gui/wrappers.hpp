@@ -7,8 +7,8 @@
 #include <string>
 #include <initializer_list>
 #include <memory>
-#include <iostream>
-#include "client.hpp"
+
+#include "ffi.hpp"
 
 namespace ffi{
 
@@ -19,7 +19,7 @@ struct Bytes {
   const uint8_t* m_data;
   const uint64_t m_len;
   Bytes(const uint8_t* data, const uint64_t len):m_data(data),m_len(len){};
-  ~Bytes(){ std::cout << "destory bytes" << std::endl ;free_vec_u8(m_data,m_len);}
+  ~Bytes();
 };
 
 std::string last_error_message();
@@ -150,6 +150,7 @@ struct ClientBuilder {
 
   /// Sets the default headers for every request.
   ClientBuilder* default_headers(HeaderMap* headermap);
+  ClientBuilder* default_headers(std::initializer_list<Pair> headers);
 
   /// Allow HTTP/0.9 responses
   ClientBuilder* http09_responses();
