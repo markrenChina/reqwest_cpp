@@ -12,7 +12,7 @@ ffi::Client* clinet = nullptr;
 void MainWindow::test_full() {
   //std::cout << "Creating the request" << std::endl;
     try{
-      auto cb = ffi::ClientBuilder::New();
+      //auto cb = ffi::ClientBuilder::New();
       auto headerMap = ffi::HeaderMap::New();
       headerMap->insert("default","value");
       if (!clinet){
