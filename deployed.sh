@@ -1,3 +1,6 @@
+if [ ! -d ./build ];then
+    mkdir build
+fi
 cd build
 cmake ..
 make
@@ -8,3 +11,4 @@ cp client/libclient.so ./dist
 cp gui/libreqwest_cpp.so ./dist
 cp ../gui/wrappers.hpp ./dist
 cp ../gui/ffi.hpp ./dist
+cp ../gui/rstring.hpp ./dist

@@ -247,6 +247,10 @@ RequestBuilder* Client::post(const std::string &url){
   RETURN_SELF_NULL_THROW(ffi::client_post(this,url.c_str()))
 }
 
+RequestBuilder* Client::put(const std::string &url){
+  RETURN_SELF_NULL_THROW(ffi::client_put(this,url.c_str()))
+}
+
 RequestBuilder* Client::request(const std::string& method,const std::string &url){
   RETURN_SELF_NULL_THROW(ffi::client_request(this,method.c_str(),url.c_str()))
 }
