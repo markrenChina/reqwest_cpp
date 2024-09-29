@@ -1,5 +1,33 @@
 Provide c/c++to call rust's reqwest library using ffi mode
 
+# build
+use deployed.sh
+first error:
+```
+note: previous definition of ‘struct ffi::Pair’
+   13 | struct Pair {
+      |        ^~~~
+```
+open build/clinet/client.hpp delete struct Pair 
+```
+namespace ffi {
+
+struct Pair {
+  const char *key;
+  const char *value;
+};
+
+extern "C" {
+```
+to
+```
+namespace ffi {
+
+extern "C" {
+```
+use eployed.sh again
+if sucess . all files in build/dist dir
+
 # Usage
 Example in dir gui, Used qt.
 in c++ you need link reqwest_cpp and client.
